@@ -57,9 +57,9 @@ function copy_custom_template_file()
         // Display an error message or log the error
         error_log('Failed to copy template file to destination directory.');
         return;
-    } else {
-        error_log($destination_file);
     }
+    // Flush permalinks
+    flush_rewrite_rules();
 }
 
 
