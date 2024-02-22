@@ -1,6 +1,5 @@
 <?php
 
-require_once(__DIR__ . '/messages/dashboard-admin-messages.php');
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 /*
@@ -8,6 +7,14 @@ Plugin Name: Tutor LMS Online Session Extension
 Description: Adds an online session menu to Tutor LMS and to the WP dashboard with Dyte.
 Version: 1.0
 Author: Win Authority LLC
+Plugin URI:        https://www.winauthority.com/plugins/tutor-lms-online-session/
+Version:           0.0.1
+Requires at least: 5.2
+Requires PHP:      7.2
+Author URI:        https://www.winauthority.com/
+License:           GPL v2 or later
+License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+Update URI:        https://www.winauthority.com/
 */
 
 // Check if Tutor LMS is active
