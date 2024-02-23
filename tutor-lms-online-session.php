@@ -1,5 +1,6 @@
 <?php
 
+global $wp_filesystem;
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 /*
@@ -8,7 +9,7 @@ Description: Adds an online session menu to Tutor LMS and to the WP dashboard wi
 Version: 1.0
 Author: Win Authority LLC
 Plugin URI:        https://www.winauthority.com/plugins/tutor-lms-online-session/
-Version:           0.0.1
+Version:           0.0.2
 Requires at least: 5.2
 Requires PHP:      7.2
 Author URI:        https://www.winauthority.com/
@@ -41,26 +42,53 @@ register_activation_hook(__FILE__, 'custom_tutor_lms_extension_activate');
 // Function to copy the template file to the Tutor LMS directory
 function copy_custom_template_file()
 {
-    $source_file = plugin_dir_path(__FILE__) . '/views/online_session.php';
-    $destination_dir = ABSPATH . 'wp-content/plugins/tutor/templates/dashboard/';
+    $source_file = plugin_dir_path(__FILE__) . 'views/online_session.php';
+    $source_dir = plugin_dir_path(__FILE__) . 'views/online-session/';
+    $destination_tutor_dir = ABSPATH . 'wp-content/plugins/tutor/templates/dashboard/';
 
     // Create the destination directory if it doesn't exist
+    if (!file_exists($destination_tutor_dir)) {
+        mkdir($destination_tutor_dir, 0755, true);
+    }
+
+    $destination_file = $destination_tutor_dir . 'online_session.php';
+    $destination_dir = $destination_tutor_dir . 'online-session/';
+
     if (!file_exists($destination_dir)) {
         mkdir($destination_dir, 0755, true);
     }
 
-    $destination_file = $destination_dir . 'online_session.php';
-
     // Copy the file
-    $success = copy($source_file, $destination_file);
-    if (!$success) {
+    $success_file = copy($source_file, $destination_file);
+    $success_dir = copy_recursive($source_dir, $destination_dir);
+
+    if (!$success_file || !$success_dir) {
         // Display an error message or log the error
         error_log('Failed to copy template file to destination directory.');
         return;
     }
+
     // Flush permalinks
     flush_rewrite_rules();
 }
+
+function copy_recursive($src, $dst)
+{
+    $dir = opendir($src);
+    @mkdir($dst);
+    while (false !== ($file = readdir($dir))) {
+        if (($file != '.') && ($file != '..')) {
+            if (is_dir($src . '/' . $file)) {
+                copy_recursive($src . '/' . $file, $dst . '/' . $file);
+            } else {
+                copy($src . '/' . $file, $dst . '/' . $file);
+            }
+        }
+    }
+    closedir($dir);
+    return true;
+}
+
 
 
 // Add custom link to Tutor LMS dashboard navigation
