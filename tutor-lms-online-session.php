@@ -35,6 +35,11 @@ function custom_tutor_lms_extension_activate()
     } else {
         // Copy the template file to the Tutor LMS directory
         copy_custom_template_file();
+
+        add_rewrite_rule('^online-session/?', 'index.php?custom_endpoint=online-session', 'top');
+
+        // Flush permalinks
+        flush_rewrite_rules();
     }
 }
 register_activation_hook(__FILE__, 'custom_tutor_lms_extension_activate');
@@ -96,3 +101,35 @@ function load_custom_dashboard_view()
     }
 }
 add_action('tutor_dashboard_template_loader', 'load_custom_dashboard_view');
+
+// Function to run upon parsing the request
+function custom_parse_request($wp)
+{
+    // Check if the requested URL matches the custom endpoint pattern
+    if (isset($wp->query_vars) && preg_match('/^online-session\/?$/', $wp->request, $matches)) {
+        // Set the custom query variable
+        $wp->query_vars['custom_endpoint'] = 'online-session';
+    }
+}
+add_action('parse_request', 'custom_parse_request');
+
+// Load custom view file for the custom URL
+function load_custom_template_file()
+{
+    // Retrieve the value of custom_endpoint query variable
+    $custom_endpoint = get_query_var('custom_endpoint');
+
+    // Check if the custom_endpoint is set to 'online-session'
+    if ($custom_endpoint === 'online-session') {
+        $template = plugin_dir_path(__FILE__) . '/views/online_session_template.php';
+        if (file_exists($template)) {
+            include $template;
+            exit;
+        } else {
+            error_log('Template File Not Found'); // Debug statement if template file not found
+        }
+    } else {
+        error_log('Template file not requested');
+    }
+}
+add_action('template_redirect', 'load_custom_template_file');
