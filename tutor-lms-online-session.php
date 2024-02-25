@@ -3,6 +3,7 @@
 global $wp_filesystem;
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 require_once(__DIR__ . '/utils/file_dir_helper.php');
+require_once(__DIR__ . '/views/workouts/workouts.php');
 
 /*
 Plugin Name: Tutor LMS Online Session Extension
